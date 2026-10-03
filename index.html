@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS 2026 // Quantum Horizons - International Cybernetic Techfest</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Three.js (r128), Canvas Confetti & HTML2Canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            void: '#030712',
+            cyberCyan: '#00f2fe',
+            cyberBlue: '#4facfe',
+            hyperViolet: '#9b51e0',
+            electricEmerald: '#00ff88',
+            hologramPink: '#ff007f',
+            solarAmber: '#ffaa00',
+            hudBorder: 'rgba(0, 242, 254, 0.25)',
+            hudGlass: 'rgba(7, 12, 24, 0.85)'
+          },
+          fontFamily: {
+            cyber: ['Orbitron', 'sans-serif'],
+            tech: ['Rajdhani', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          boxShadow: {
+            'neon-cyan': '0 0 25px rgba(0, 242, 254, 0.45)',
+            'neon-violet': '0 0 30px rgba(155, 81, 224, 0.5)',
+            'neon-emerald': '0 0 25px rgba(0, 255, 136, 0.45)',
+            'neon-pink': '0 0 25px rgba(255, 0, 127, 0.45)',
+            'neon-amber': '0 0 25px rgba(255, 170, 0, 0.45)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #030712; }
+    ::-webkit-scrollbar-thumb { background: #00f2fe44; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #00f2feaa; }
+
+    /* Cyber scanline and grid */
+    .bg-scanlines {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 3px, 6px 100%;
+    }
+    .bg-cyber-grid {
+      background-image: linear-gradient(to right, rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+      background-size: 44px 44px;
+    }
+
+    /* Glitch Text Effects */
+    .glitch-text {
+      position: relative;
+      display: inline-block;
+    }
+    .glitch-text::before,
+    .glitch-text::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      clip: rect(0, 0, 0, 0);
+    }
+    .glitch-text:hover::before {
+      left: -2px;
+      text-shadow: 2px 0 #00f2fe;
+      animation: glitch-step-1 1.8s infinite linear alternate-reverse;
+    }
+    .glitch-text:hover::after {
+      left: 2px;
+      text-shadow: -2px 0 #ff007f;
+      animation: glitch-step-2 2.2s infinite linear alternate-reverse;
+    }
+    @keyframes glitch-step-1 {
+      0% { clip: rect(12px, 9999px, 44px, 0); }
+      35% { clip: rect(54px, 9999px, 86px, 0); }
+      70% { clip: rect(20px, 9999px, 62px, 0); }
+      100% { clip: rect(80px, 9999px, 120px, 0); }
+    }
+    @keyframes glitch-step-2 {
+      0% { clip: rect(65px, 9999px, 92px, 0); }
+      40% { clip: rect(18px, 9999px, 42px, 0); }
+      80% { clip: rect(44px, 9999px, 78px, 0); }
+      100% { clip: rect(8px, 9999px, 32px, 0); }
+    }
+
+    /* Cyber Glass Cards */
+    .cyber-card {
+      background: linear-gradient(135deg, rgba(13, 20, 38, 0.8) 0%, rgba(4, 9, 20, 0.92) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cyber-card:hover {
+      border-color: rgba(0, 242, 254, 0.65);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px -10px rgba(0, 242, 254, 0.25);
+    }
+
+    /* Custom Cursor Elements */
+    #cursor-dot, #cursor-trail {
+      pointer-events: none;
+      position: fixed;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.2s ease;
+    }
+    #cursor-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #00f2fe;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #00f2fe, 0 0 20px #00f2fe;
+    }
+    #cursor-trail {
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid rgba(0, 242, 254, 0.45);
+      border-radius: 50%;
+      transition: width 0.15s, height 0.15s, border-color 0.2s, transform 0.08s ease-out;
+    }
+
+    /* Holographic Ticket Iridescent Sheen */
+    .hologram-card {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(3, 7, 18, 0.98));
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .holo-sheen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        115deg,
+        transparent 15%,
+        rgba(0, 242, 254, 0.25) 30%,
+        rgba(155, 81, 224, 0.35) 48%,
+        rgba(255, 0, 127, 0.3) 65%,
+        transparent 85%
+      );
+      mix-blend-mode: color-dodge;
+      pointer-events: none;
+      opacity: 0.65;
+      transition: opacity 0.3s;
+    }
+
+    /* Terminal Boot Cursor */
+    .typing-cursor::after {
+      content: '▋';
+      display: inline-block;
+      margin-left: 3px;
+      color: #00f2fe;
+      animation: blink 0.9s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Portal Ring & Laser Radar Animations */
+    @keyframes portalSpin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.08); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    .portal-ring {
+      animation: portalSpin 16s linear infinite;
+    }
+
+    @keyframes radarSweep {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .radar-sweep {
+      animation: radarSweep 3s linear infinite;
+    }
+
+    @keyframes corePulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.25); opacity: 1; }
+    }
+    .animate-core-pulse {
+      animation: corePulse 1.8s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-void text-slate-100 font-tech selection:bg-cyberCyan selection:text-void overflow-x-hidden antialiased relative">
+
+  <!-- Custom Cyber Cursor -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-trail"></div>
+
+  <!-- Cyber Scanline & Vignette Overlay -->
+  <div class="fixed inset-0 pointer-events-none bg-scanlines opacity-40 z-20"></div>
+  <div class="fixed inset-0 pointer-events-none bg-cyber-grid opacity-35 z-0"></div>
+
+  <!-- Background WebGL 3D Canvas -->
+  <canvas id="webgl-canvas" class="fixed inset-0 w-full h-full pointer-events-auto z-0"></canvas>
+  
+  <!-- Interactive Toast Notification Container -->
+  <div id="toast-container" class="fixed top-24 right-5 z-[9999] flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- =========================================================================
+       AUTOMATIC UNINTERRUPTED CYBER ENTRY / PRELOADER ANIMATION (NO BUTTONS)
+       ========================================================================= -->
+  <div id="preloader" class="fixed inset-0 z-[10000] bg-void flex flex-col items-center justify-center p-4 sm:p-6 transition-all duration-700">
+    
+    <!-- Background Futuristic Gyroscopic Rings & Energy Vortex -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+      <div class="w-[550px] h-[550px] sm:w-[750px] sm:h-[750px] border border-cyberCyan/20 rounded-full portal-ring flex items-center justify-center">
+        <div class="w-[85%] h-[85%] border border-dashed border-hyperViolet/40 rounded-full flex items-center justify-center">
+          <div class="w-[70%] h-[70%] border border-electricEmerald/30 rounded-full flex items-center justify-center">
+            <!-- Central Laser Radar Sweep Line -->
+            <div class="w-full h-full rounded-full border border-cyberCyan/40 relative overflow-hidden radar-sweep">
+              <div class="w-1/2 h-full bg-gradient-to-r from-transparent to-cyberCyan/20 transform origin-right"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="absolute w-[320px] h-[320px] bg-cyberCyan/15 rounded-full blur-3xl animate-pulse"></div>
+    </div>
+
+    <!-- Preloader HUD Display Box -->
+    <div class="max-w-xl w-full cyber-card p-6 sm:p-10 rounded-3xl border-2 border-cyberCyan/50 shadow-neon-cyan relative z-10 overflow-hidden">
+      
+      <!-- Top Status Terminal Bar -->
+      <div class="flex items-center justify-between border-b border-hudBorder pb-4 text-xs font-mono">
+        <div class="flex items-center space-x-2">
+          <span class="w-3 h-3 rounded-full bg-red-500"></span>
+          <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+          <span class="w-3 h-3 rounded-full bg-electricEmerald animate-ping"></span>
+          <span class="text-slate-300 ml-2 tracking-wider">NEXUS_QUANTUM_CORE // v2.6.4</span>
+        </div>
+        <span id="term-status" class="text-cyberCyan font-bold tracking-widest px-2.5 py-0.5 rounded bg-cyberCyan/10 border border-cyberCyan/30">
+          DECRYPTING...
+        </span>
+      </div>
+
+      <!-- Center Glowing Animated Quantum Iris & Title -->
+      <div class="my-6 text-center space-y-4">
+        <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+          <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-cyberCyan via-hyperViolet to-electricEmerald opacity-30 blur-md animate-pulse"></div>
+          <div class="w-16 h-16 rounded-2xl border-2 border-cyberCyan bg-void/90 flex items-center justify-center shadow-neon-cyan animate-core-pulse">
+            <span class="font-cyber font-black text-2xl text-cyberCyan">N</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="inline-block px-3 py-1 rounded-full border border-hyperViolet/40 bg-hyperViolet/10 text-hyperViolet font-mono text-[11px] tracking-widest uppercase">
+            ✦ AUTOMATIC NEURAL SYNC ✦
+          </div>
+          <h1 class="font-cyber font-black text-3xl sm:text-4xl text-white tracking-wider uppercase glitch-text mt-2" data-text="NEXUS GATEWAY">
+            NEXUS <span class="bg-gradient-to-r from-cyberCyan via-hyperViolet to-electricEmerald bg-clip-text text-transparent">GATEWAY</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Live Terminal Decryption Stream -->
+      <div class="my-4 p-4 rounded-2xl bg-void/90 border border-hudBorder space-y-1.5 font-mono text-xs text-slate-300">
+        <div id="term-line-1" class="text-slate-400">> ESTABLISHING QUANTUM HANDSHAKE...</div>
+        <div id="term-line-2" class="text-slate-400 hidden">> COMPILING 3D SPATIAL TENSOR FIELD...</div>
+        <div id="term-line-3" class="text-slate-400 hidden">> SYNTHESIZING PROCEDURAL AUDIO ENGINE...</div>
+        <div id="term-line-4" class="text-cyberCyan font-bold hidden">> READY: LAUNCHING HYPERSPACE WARP...</div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="space-y-2">
+        <div class="flex justify-between text-xs font-mono">
+          <span class="text-slate-400">QUANTUM MATRIX SYNC</span>
+          <span id="preload-pct" class="text-cyberCyan font-bold">0%</span>
+        </div>
+        <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-cyberCyan/30 p-0.5">
+          <div id="preload-bar" class="h-full bg-gradient-to-r from-cyberCyan via-hyperViolet to-electricEmerald rounded-full w-0 transition-all duration-75 shadow-neon-cyan"></div>
+        </div>
+      </div>
+
+      <div class="mt-4 text-center">
+        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest animate-pulse">
+          Synchronizing 3D Spatial Pipeline • Auto-entering main matrix...
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MAIN NAVIGATION BAR & MOBILE DRAWER
+       ========================================================================= -->
+  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-void/80 border-b border-hudBorder transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#hero" class="flex items-center space-x-3 group cursor-pointer" onclick="sfxNavClick()">
+        <div class="relative w-10 h-10 flex items-center justify-center border border-cyberCyan/40 bg-cyberCyan/10 rounded-xl group-hover:border-cyberCyan group-hover:shadow-neon-cyan transition-all">
+          <span class="font-cyber font-extrabold text-cyberCyan text-xl">N</span>
+          <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-electricEmerald rounded-full animate-ping"></span>
+        </div>
+        <div>
+          <div class="font-cyber font-black tracking-widest text-lg sm:text-xl text-white group-hover:text-cyberCyan transition-colors">
+            NEXUS<span class="text-cyberCyan">.2026</span>
+          </div>
+          <p class="font-mono text-[9px] uppercase tracking-widest text-slate-400">Quantum Horizons</p>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links with ScrollSpy active indicator -->
+      <nav id="desktop-nav" class="hidden md:flex items-center space-x-7 text-xs font-mono uppercase tracking-wider">
+        <a href="#about" class="nav-link text-slate-300 hover:text-cyberCyan transition-colors py-1 border-b-2 border-transparent" onclick="sfxNavClick()">Odyssey</a>
+        <a href="#competitions" class="nav-link text-slate-300 hover:text-cyberCyan transition-colors py-1 border-b-2 border-transparent" onclick="sfxNavClick()">Arenas</a>
+        <a href="#schedule" class="nav-link text-slate-300 hover:text-cyberCyan transition-colors py-1 border-b-2 border-transparent" onclick="sfxNavClick()">Timeline</a>
+        <a href="#lab" class="nav-link text-slate-300 hover:text-cyberCyan transition-colors py-1 border-b-2 border-transparent" onclick="sfxNavClick()">3D Lab</a>
+        <a href="#pass" class="nav-link text-slate-300 hover:text-cyberCyan transition-colors py-1 border-b-2 border-transparent" onclick="sfxNavClick()">VIP HoloPass</a>
+      </nav>
+
+      <!-- Audio Controller & Action Controls -->
+      <div class="flex items-center space-x-3">
+        
+        <!-- Audio Synth Toggle -->
+        <button id="audio-toggle" onclick="toggleSynthAudio()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-hudBorder bg-slate-900/80 hover:border-cyberCyan text-xs font-mono text-slate-300 transition-all cursor-pointer" title="Synthesizer Sound Matrix">
+          <span id="audio-wave-anim" class="flex items-center space-x-0.5 h-3">
+            <span class="w-0.5 h-2 bg-slate-500 rounded-full"></span>
+            <span class="w-0.5 h-3 bg-slate-500 rounded-full"></span>
+            <span class="w-0.5 h-1.5 bg-slate-500 rounded-full"></span>
+          </span>
+          <span id="audio-status-label">SFX: OFF</span>
+        </button>
+
+        <a href="#pass" onclick="sfxNavClick()" class="hidden sm:inline-flex px-4 py-2 text-xs uppercase font-cyber font-bold tracking-wider rounded-xl bg-gradient-to-r from-cyberCyan to-hyperViolet text-void shadow-neon-cyan hover:opacity-90 transition-opacity">
+          Mint Pass
+        </a>
+
+        <!-- Mobile Menu Hamburger Button -->
+        <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl border border-hudBorder text-cyberCyan hover:bg-cyberCyan/10 focus:outline-none">
+          <svg id="mobile-menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Mobile Slide-Down Menu Drawer -->
+    <div id="mobile-drawer" class="hidden md:hidden bg-void/95 border-b border-hudBorder px-6 py-6 space-y-4 font-mono text-sm uppercase tracking-wider backdrop-blur-2xl">
+      <a href="#about" onclick="toggleMobileMenu(); sfxNavClick();" class="block py-2 text-slate-200 hover:text-cyberCyan border-b border-white/5">✦ Odyssey</a>
+      <a href="#competitions" onclick="toggleMobileMenu(); sfxNavClick();" class="block py-2 text-slate-200 hover:text-cyberCyan border-b border-white/5">✦ Arenas & Prizes</a>
+      <a href="#schedule" onclick="toggleMobileMenu(); sfxNavClick();" class="block py-2 text-slate-200 hover:text-cyberCyan border-b border-white/5">✦ Timeline Schedule</a>
+      <a href="#lab" onclick="toggleMobileMenu(); sfxNavClick();" class="block py-2 text-slate-200 hover:text-cyberCyan border-b border-white/5">✦ 3D Physics Lab</a>
+      <a href="#pass" onclick="toggleMobileMenu(); sfxNavClick();" class="block py-2 text-slate-200 hover:text-cyberCyan border-b border-white/5">✦ VIP HoloPass Mint</a>
+      <div class="pt-2">
+        <a href="#pass" onclick="toggleMobileMenu(); sfxNavClick();" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyberCyan to-hyperViolet text-void font-cyber font-bold text-center block text-xs uppercase tracking-widest shadow-neon-cyan">
+          Mint VIP Pass
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Floating 3D Core Quick Theme Controller -->
+  <div class="fixed bottom-6 right-6 z-40 flex flex-col items-end space-y-2 pointer-events-auto">
+    <div class="px-2.5 py-1 bg-void/90 border border-hudBorder rounded text-[9px] font-mono text-cyberCyan backdrop-blur-md">
+      3D CORE MATRIX
+    </div>
+    <div class="flex bg-void/95 backdrop-blur-xl border border-hudBorder rounded-xl p-1.5 shadow-2xl space-x-1">
+      <button onclick="changeCoreTheme('cyan')" class="theme-btn active px-2.5 py-1 rounded text-xs font-mono border border-cyberCyan bg-cyberCyan/20 text-cyberCyan" data-theme="cyan">Cyan</button>
+      <button onclick="changeCoreTheme('emerald')" class="theme-btn px-2.5 py-1 rounded text-xs font-mono text-slate-400 hover:text-white" data-theme="emerald">Emerald</button>
+      <button onclick="changeCoreTheme('violet')" class="theme-btn px-2.5 py-1 rounded text-xs font-mono text-slate-400 hover:text-white" data-theme="violet">Vapor</button>
+      <button onclick="changeCoreTheme('amber')" class="theme-btn px-2.5 py-1 rounded text-xs font-mono text-slate-400 hover:text-white" data-theme="amber">Solar</button>
+      <button onclick="triggerShockwavePulse()" class="px-2.5 py-1 rounded text-xs font-mono bg-hologramPink/20 text-hologramPink border border-hologramPink/40 hover:bg-hologramPink hover:text-void transition-all font-bold" title="Pulse Shockwave">
+        ⚡ Pulse
+      </button>
+    </div>
+  </div>
+
+  <!-- Interactive AI Assistant HUD Widget (Bottom Left) -->
+  <div class="fixed bottom-6 left-6 z-40 pointer-events-auto">
+    <div id="ai-chat-box" class="hidden w-80 sm:w-96 cyber-card p-4 rounded-2xl border border-cyberCyan/50 shadow-2xl space-y-3 mb-3 bg-void/95 backdrop-blur-2xl">
+      <div class="flex items-center justify-between border-b border-hudBorder pb-2.5 text-xs font-mono">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyberCyan animate-ping"></span>
+          <span class="text-white font-bold">NEXUS-AI NAVIGATOR</span>
+        </div>
+        <button onclick="toggleAiChat()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      
+      <div id="ai-messages" class="h-48 overflow-y-auto space-y-2 text-xs font-mono p-2 bg-slate-950/80 rounded-xl border border-white/5">
+        <div class="text-cyberCyan">
+          🤖 NEXUS-AI: Greetings Operative! How can I assist your navigation today?
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-1.5 text-[10px] font-mono">
+        <button onclick="askAiQuestion('arenas')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-cyberCyan/20 hover:text-cyberCyan border border-white/10 text-slate-300 text-left truncate">✦ Find Arenas</button>
+        <button onclick="askAiQuestion('register')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-cyberCyan/20 hover:text-cyberCyan border border-white/10 text-slate-300 text-left truncate">✦ Registration</button>
+        <button onclick="askAiQuestion('schedule')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-cyberCyan/20 hover:text-cyberCyan border border-white/10 text-slate-300 text-left truncate">✦ Keynote Schedule</button>
+        <button onclick="askAiQuestion('badge')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-cyberCyan/20 hover:text-cyberCyan border border-white/10 text-slate-300 text-left truncate">✦ VIP Badge Mint</button>
+      </div>
+    </div>
+
+    <button onclick="toggleAiChat()" class="flex items-center space-x-2.5 px-4 py-2.5 rounded-2xl bg-slate-900/90 border border-cyberCyan/50 text-cyberCyan text-xs font-mono shadow-neon-cyan hover:bg-cyberCyan hover:text-void transition-all cursor-pointer">
+      <span class="w-2.5 h-2.5 rounded-full bg-cyberCyan animate-ping"></span>
+      <span class="font-bold">NEXUS-AI ASSISTANT</span>
+    </button>
+  </div>
+
+  <!-- =========================================================================
+       SECTION 1: HERO VIEWPORT
+       ========================================================================= -->
+  <main class="relative z-10">
+    <section id="hero" class="min-h-screen flex flex-col justify-center items-center text-center px-4 pt-24 pb-16 relative">
+      <div class="max-w-5xl mx-auto space-y-6">
+        
+        <!-- Live Alert Badge -->
+        <div class="inline-flex items-center space-x-2.5 px-4 py-1.5 rounded-full border border-cyberCyan/40 bg-cyberCyan/10 backdrop-blur-md text-cyberCyan font-mono text-xs tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-cyberCyan animate-ping"></span>
+          <span>SYSTEM READY // OCTOBER 16-18, 2026 • HYPERSPHERE VENUE</span>
+        </div>
+
+        <!-- Main Title -->
+        <h1 class="font-cyber font-black text-5xl sm:text-7xl lg:text-8xl tracking-tight text-white uppercase glitch-text" data-text="NEXUS 2026">
+          NEXUS <span class="bg-gradient-to-r from-cyberCyan via-hyperViolet to-electricEmerald bg-clip-text text-transparent">2026</span>
+        </h1>
+
+        <!-- Dynamic Typing / Animated Keyword Cycler -->
+        <div class="h-10 flex items-center justify-center">
+          <p class="font-mono text-lg sm:text-2xl text-slate-300 font-semibold tracking-wide">
+            EXPLORING <span id="animated-keyword" class="text-cyberCyan font-cyber font-bold tracking-wider typing-cursor">QUANTUM COMPUTING</span>
+          </p>
+        </div>
+
+        <p class="font-tech text-base sm:text-xl text-slate-300 max-w-2xl mx-auto font-medium leading-relaxed">
+          The globe's largest convergence of quantum researchers, synthetic intelligence builders, and cybernetic pioneers.
+        </p>
+
+        <!-- 3D Interactive Control Hint -->
+        <div class="flex items-center justify-center space-x-2 text-xs font-mono text-slate-400 py-1">
+          <span class="text-cyberCyan animate-pulse">✦</span>
+          <span>Click & Drag anywhere to rotate the 3D Quantum Core</span>
+          <span class="text-cyberCyan animate-pulse">✦</span>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <a href="#competitions" onclick="sfxNavClick()" class="px-8 py-3.5 rounded-xl font-cyber font-bold text-xs uppercase tracking-widest bg-cyberCyan text-void shadow-neon-cyan hover:bg-cyan-300 hover:shadow-cyan-400/60 transform hover:-translate-y-0.5 transition-all">
+            Explore Arenas & Prizes
+          </a>
+          <a href="#pass" onclick="sfxNavClick()" class="px-8 py-3.5 rounded-xl font-cyber font-bold text-xs uppercase tracking-widest border border-hudBorder bg-void/60 backdrop-blur-md text-slate-200 hover:border-hyperViolet hover:text-hyperViolet hover:shadow-neon-violet transition-all">
+            Mint VIP HoloPass
+          </a>
+        </div>
+
+        <!-- Live Millisecond Countdown HUD -->
+        <div class="grid grid-cols-4 gap-3 max-w-lg mx-auto pt-6">
+          <div class="cyber-card p-3 rounded-xl text-center border-l-2 border-l-cyberCyan">
+            <span id="days" class="block font-cyber text-2xl sm:text-3xl font-extrabold text-cyberCyan">12</span>
+            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Days</span>
+          </div>
+          <div class="cyber-card p-3 rounded-xl text-center border-l-2 border-l-hyperViolet">
+            <span id="hours" class="block font-cyber text-2xl sm:text-3xl font-extrabold text-hyperViolet">04</span>
+            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Hours</span>
+          </div>
+          <div class="cyber-card p-3 rounded-xl text-center border-l-2 border-l-electricEmerald">
+            <span id="mins" class="block font-cyber text-2xl sm:text-3xl font-extrabold text-electricEmerald">28</span>
+            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Mins</span>
+          </div>
+          <div class="cyber-card p-3 rounded-xl text-center border-l-2 border-l-hologramPink">
+            <span id="millis" class="block font-mono text-2xl sm:text-3xl font-extrabold text-hologramPink">98</span>
+            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">CentiSecs</span>
+          </div>
+        </div>
+
+      </div>
+
+      <a href="#about" onclick="sfxNavClick()" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-1 text-slate-400 hover:text-cyberCyan transition-colors">
+        <span class="font-mono text-[9px] tracking-widest uppercase">Scroll Down</span>
+        <span class="text-xs animate-bounce">▼</span>
+      </a>
+    </section>
+
+    <!-- =========================================================================
+       SECTION 2: ABOUT / ODYSSEY
+       ========================================================================= -->
+    <section id="about" class="min-h-screen flex items-center py-24 px-4 relative">
+      <div class="max-w-7xl mx-auto w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center space-x-2 font-mono text-xs text-cyberCyan tracking-widest uppercase">
+              <span class="w-8 h-[1px] bg-cyberCyan"></span>
+              <span>Genesis Protocol // Techfest 2026</span>
+            </div>
+            
+            <h2 class="font-cyber font-extrabold text-3xl sm:text-5xl text-white leading-tight">
+              A DECADE BEYOND SILICON. <br>
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberCyan to-hyperViolet">WHERE FUTURES COLLIDE.</span>
+            </h2>
+
+            <p class="font-tech text-lg text-slate-300 leading-relaxed">
+              NEXUS 2026 gathers over 15,000 elite hackers, quantum engineers, roboticists, and creative coders from 48 nations. Held concurrently in physical cyber-stages and streamed into an interactive real-time WebGL space.
+            </p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
+              <div class="cyber-card p-4 rounded-xl border-l-4 border-l-cyberCyan">
+                <div class="font-cyber text-3xl font-extrabold text-white">48+</div>
+                <div class="font-mono text-xs text-slate-400 mt-1">Hack Challenges</div>
+              </div>
+              <div class="cyber-card p-4 rounded-xl border-l-4 border-l-hyperViolet">
+                <div class="font-cyber text-3xl font-extrabold text-white">$150K</div>
+                <div class="font-mono text-xs text-slate-400 mt-1">Bounty Bounty Pool</div>
+              </div>
+              <div class="cyber-card p-4 rounded-xl border-l-4 border-l-electricEmerald">
+                <div class="font-cyber text-3xl font-extrabold text-white">15K+</div>
+                <div class="font-mono text-xs text-slate-400 mt-1">Global Operatives</div>
+              </div>
+            </div>
+
+            <div class="pt-2 flex flex-wrap gap-4">
+              <button onclick="triggerShockwavePulse(); sfxNavClick();" class="inline-flex items-center space-x-3 px-6 py-3 rounded-xl border border-cyberCyan/50 bg-cyberCyan/10 hover:bg-cyberCyan hover:text-void font-cyber text-xs uppercase tracking-widest transition-all">
+                <span>Emit Core Shockwave</span>
+                <span>⚡</span>
+              </button>
+              <a href="#lab" onclick="sfxNavClick()" class="inline-flex items-center space-x-2 px-6 py-3 rounded-xl border border-hudBorder text-xs font-mono text-slate-300 hover:border-hyperViolet hover:text-white transition-all">
+                <span>Configure 3D Physics ⟶</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5">
+            <div class="cyber-card p-6 sm:p-8 rounded-2xl relative overflow-hidden border border-cyberCyan/30">
+              <div class="flex items-center justify-between pb-4 border-b border-hudBorder">
+                <span class="font-mono text-xs text-cyberCyan font-bold">SYSTEM TELEMETRY MATRIX</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-electricEmerald animate-ping"></span>
+              </div>
+              <ul class="space-y-4 pt-4 font-mono text-xs text-slate-300">
+                <li class="flex justify-between items-center pb-2 border-b border-white/5">
+                  <span class="text-slate-400">WebGL Shader Pipeline:</span>
+                  <span class="text-cyberCyan font-bold">ACTIVE (60 FPS)</span>
+                </li>
+                <li class="flex justify-between items-center pb-2 border-b border-white/5">
+                  <span class="text-slate-400">Audio Synthesis Engine:</span>
+                  <span class="text-electricEmerald font-bold" id="telemetry-audio-stat">OFFLINE</span>
+                </li>
+                <li class="flex justify-between items-center pb-2 border-b border-white/5">
+                  <span class="text-slate-400">Active Particle Nodes:</span>
+                  <span class="text-white font-bold" id="telemetry-particles">2,400 Nodes</span>
+                </li>
+                <li class="flex justify-between items-center">
+                  <span class="text-slate-400">Core Vector Tension:</span>
+                  <span class="text-hyperViolet font-bold" id="telemetry-tension">1.000 G-Force</span>
+                </li>
+              </ul>
+              <div class="mt-6 pt-4 border-t border-hudBorder/50">
+                <div class="flex justify-between text-[11px] font-mono text-slate-400 mb-1">
+                  <span>SUBSYSTEM HARMONIZATION</span>
+                  <span class="text-cyberCyan font-bold">99.8%</span>
+                </div>
+                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                  <div class="bg-gradient-to-r from-cyberCyan via-hyperViolet to-electricEmerald h-full w-[99.8%]"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+       SECTION 3: COMPETITIONS & ARENAS (WITH LIVE SEARCH & FILTERING)
+       ========================================================================= -->
+    <section id="competitions" class="min-h-screen py-24 px-4 relative">
+      <div class="max-w-7xl mx-auto space-y-10">
+        
+        <div class="text-center max-w-3xl mx-auto space-y-4">
+          <div class="inline-flex items-center space-x-2 font-mono text-xs text-hyperViolet tracking-widest uppercase">
+            <span class="w-8 h-[1px] bg-hyperViolet"></span>
+            <span>Championship Arenas</span>
+            <span class="w-8 h-[1px] bg-hyperViolet"></span>
+          </div>
+          <h2 class="font-cyber font-extrabold text-4xl sm:text-5xl text-white">
+            CHALLENGE THE CODESPACE
+          </h2>
+          <p class="font-tech text-lg text-slate-300">
+            Select your competition track. Build decentralized autonomous agents, command physical rovers, or defeat quantum crypto ciphers.
+          </p>
+        </div>
+
+        <!-- Search Bar and Category Filter Pills -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-900/80 p-4 rounded-2xl border border-hudBorder">
+          
+          <!-- Category Filter Buttons -->
+          <div class="flex flex-wrap gap-2 text-xs font-mono">
+            <button onclick="filterArenas('all')" class="arena-filter active px-4 py-2 rounded-xl bg-cyberCyan text-void font-bold">ALL ARENAS</button>
+            <button onclick="filterArenas('ai')" class="arena-filter px-4 py-2 rounded-xl border border-hudBorder text-slate-300 hover:text-white">AI & HACK</button>
+            <button onclick="filterArenas('robotics')" class="arena-filter px-4 py-2 rounded-xl border border-hudBorder text-slate-300 hover:text-white">ROBOTICS</button>
+            <button onclick="filterArenas('security')" class="arena-filter px-4 py-2 rounded-xl border border-hudBorder text-slate-300 hover:text-white">CYBERSEC</button>
+            <button onclick="filterArenas('creative')" class="arena-filter px-4 py-2 rounded-xl border border-hudBorder text-slate-300 hover:text-white">WEBGL / CREATIVE</button>
+          </div>
+
+          <!-- Live Search Input -->
+          <div class="w-full md:w-64 relative">
+            <input id="search-arenas" type="text" oninput="searchArenas()" placeholder="Search arena or keyword..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-hudBorder text-xs text-white font-mono focus:border-cyberCyan focus:outline-none">
+            <span class="absolute left-3 top-2.5 text-slate-500 text-xs">🔍</span>
+          </div>
+
+        </div>
+
+        <!-- Arena Cards Grid -->
+        <div id="arenas-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Card 1: AlgoRift Hackathon -->
+          <div class="arena-card cyber-card p-6 rounded-2xl flex flex-col justify-between group hover:border-cyberCyan transition-all" data-category="ai" data-keywords="algorift 48h hackathon decentralized ai agents">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-cyberCyan/10 border border-cyberCyan/30 flex items-center justify-center font-cyber text-cyberCyan text-xl group-hover:scale-110 transition-transform">
+                ⚡
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-cyberCyan">48H Hackathon</span>
+                <h3 class="font-cyber font-bold text-xl text-white mt-1">ALGORIFT '26</h3>
+              </div>
+              <p class="text-xs text-slate-400 font-tech leading-relaxed">
+                48-Hour non-stop marathon creating decentralized AI agents and zero-latency spatial applications.
+              </p>
+            </div>
+            <div class="pt-6 border-t border-hudBorder/50 mt-6 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-mono text-slate-500 block">PRIZE POOL</span>
+                <span class="font-cyber font-bold text-cyberCyan text-lg">$50,000</span>
+              </div>
+              <button onclick="openRegistrationModal('ALGORIFT 48H HACKATHON', 'Build next-gen decentralized AI agents or zero-knowledge spatial systems. Teams of 2 to 4. Mentored by OpenAI & Protocol Labs.', '$50,000 in bounties + VC grants.')" class="px-3.5 py-2 rounded-lg bg-cyberCyan/20 hover:bg-cyberCyan hover:text-void border border-cyberCyan text-xs font-mono text-cyberCyan font-bold transition-all">
+                Enter Track ⟶
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: RoboClash V -->
+          <div class="arena-card cyber-card p-6 rounded-2xl flex flex-col justify-between group hover:border-hyperViolet transition-all" data-category="robotics" data-keywords="roboclash v hardware robotics drones swarms obstacle">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-hyperViolet/10 border border-hyperViolet/30 flex items-center justify-center font-cyber text-hyperViolet text-xl group-hover:scale-110 transition-transform">
+                🤖
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-hyperViolet">Hardware & Sim</span>
+                <h3 class="font-cyber font-bold text-xl text-white mt-1">ROBOCLASH V</h3>
+              </div>
+              <p class="text-xs text-slate-400 font-tech leading-relaxed">
+                Autonomous drone swarms and robotic quadrupeds competing in physical obstacle courses and digital twin mazes.
+              </p>
+            </div>
+            <div class="pt-6 border-t border-hudBorder/50 mt-6 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-mono text-slate-500 block">PRIZE POOL</span>
+                <span class="font-cyber font-bold text-hyperViolet text-lg">$40,000</span>
+              </div>
+              <button onclick="openRegistrationModal('ROBOCLASH V COMBAT', 'Bring your autonomous ground robots or drones to tackle obstacle hazard courses with real-time computer vision processing.', '$40,000 in hardware grants & trophies.')" class="px-3.5 py-2 rounded-lg bg-hyperViolet/20 hover:bg-hyperViolet hover:text-void border border-hyperViolet text-xs font-mono text-hyperViolet font-bold transition-all">
+                Enter Track ⟶
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: ZeroKnowledge CTF -->
+          <div class="arena-card cyber-card p-6 rounded-2xl flex flex-col justify-between group hover:border-electricEmerald transition-all" data-category="security" data-keywords="zeroknowledge ctf security ctf crypto exploits reverse binary">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-electricEmerald/10 border border-electricEmerald/30 flex items-center justify-center font-cyber text-electricEmerald text-xl group-hover:scale-110 transition-transform">
+                🛡️
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-electricEmerald">Cyber Security</span>
+                <h3 class="font-cyber font-bold text-xl text-white mt-1">ZEROKNOWLEDGE CTF</h3>
+              </div>
+              <p class="text-xs text-slate-400 font-tech leading-relaxed">
+                Post-quantum cryptographic challenges, lattice vulnerabilities, kernel exploitation, and reverse engineering.
+              </p>
+            </div>
+            <div class="pt-6 border-t border-hudBorder/50 mt-6 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-mono text-slate-500 block">PRIZE POOL</span>
+                <span class="font-cyber font-bold text-electricEmerald text-lg">$35,000</span>
+              </div>
+              <button onclick="openRegistrationModal('ZEROKNOWLEDGE CTF', 'Capture the Flag challenge focusing on post-quantum lattice cryptography, smart contract exploits, and reverse binary puzzles.', '$35,000 in bug bounties.')" class="px-3.5 py-2 rounded-lg bg-electricEmerald/20 hover:bg-electricEmerald hover:text-void border border-electricEmerald text-xs font-mono text-electricEmerald font-bold transition-all">
+                Enter Track ⟶
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 4: Hologram Jam -->
+          <div class="arena-card cyber-card p-6 rounded-2xl flex flex-col justify-between group hover:border-hologramPink transition-all" data-category="creative" data-keywords="hologram jam creative webgl threejs webgpu spatial audio art">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-hologramPink/10 border border-hologramPink/30 flex items-center justify-center font-cyber text-hologramPink text-xl group-hover:scale-110 transition-transform">
+                🎮
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-hologramPink">Creative Coding</span>
+                <h3 class="font-cyber font-bold text-xl text-white mt-1">HOLOGRAM JAM</h3>
+              </div>
+              <p class="text-xs text-slate-400 font-tech leading-relaxed">
+                Build procedural 3D WebGL experiences, WebGPU generative art, and spatial audio synthesizer worlds.
+              </p>
+            </div>
+            <div class="pt-6 border-t border-hudBorder/50 mt-6 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-mono text-slate-500 block">PRIZE POOL</span>
+                <span class="font-cyber font-bold text-hologramPink text-lg">$25,000</span>
+              </div>
+              <button onclick="openRegistrationModal('HOLOGRAM JAM CREATIVE CODING', 'Design breathtaking interactive WebGL or WebGPU games and spatial auditory experiences right inside modern web browsers.', '$25,000 in creative software prizes.')" class="px-3.5 py-2 rounded-lg bg-hologramPink/20 hover:bg-hologramPink hover:text-void border border-hologramPink text-xs font-mono text-hologramPink font-bold transition-all">
+                Enter Track ⟶
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+       SECTION 4: INTERACTIVE SCHEDULE TIMELINE WITH SEARCH & DAY TABS
+       ========================================================================= -->
+    <section id="schedule" class="min-h-screen py-24 px-4 relative flex items-center">
+      <div class="max-w-5xl mx-auto w-full space-y-10">
+        
+        <div class="text-center space-y-4">
+          <div class="inline-flex items-center space-x-2 font-mono text-xs text-cyberCyan tracking-widest uppercase">
+            <span class="w-8 h-[1px] bg-cyberCyan"></span>
+            <span>Convergence Chronology</span>
+            <span class="w-8 h-[1px] bg-cyberCyan"></span>
+          </div>
+          <h2 class="font-cyber font-extrabold text-4xl sm:text-5xl text-white">
+            MISSION SCHEDULE
+          </h2>
+          <p class="font-tech text-slate-400 text-base max-w-xl mx-auto">
+            Three days of intense hacking, keynote revelations, live robotic matches, and midnight cyber-synth concerts.
+          </p>
+        </div>
+
+        <!-- Day Filter Tabs & Search Bar -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          
+          <div class="inline-flex bg-slate-900/80 p-1.5 rounded-2xl border border-hudBorder">
+            <button onclick="switchScheduleDay(1)" id="tab-day-1" class="day-tab active px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider bg-cyberCyan text-void font-bold shadow-neon-cyan transition-all">
+              DAY 01 (OCT 16)
+            </button>
+            <button onclick="switchScheduleDay(2)" id="tab-day-2" class="day-tab px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider text-slate-400 hover:text-white transition-all">
+              DAY 02 (OCT 17)
+            </button>
+            <button onclick="switchScheduleDay(3)" id="tab-day-3" class="day-tab px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider text-slate-400 hover:text-white transition-all">
+              DAY 03 (OCT 18)
+            </button>
+          </div>
+
+          <div class="w-full sm:w-64 relative">
+            <input id="search-schedule" type="text" oninput="filterScheduleItems()" placeholder="Filter keynote or speaker..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-hudBorder text-xs text-white font-mono focus:border-cyberCyan focus:outline-none">
+            <span class="absolute left-3 top-2.5 text-slate-500 text-xs">🔍</span>
+          </div>
+
+        </div>
+
+        <!-- Schedule Items Container -->
+        <div id="schedule-container" class="space-y-4">
+          <!-- Populated dynamically via switchScheduleDay() -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================================
+       SECTION 5: CYBERLAB 3D PHYSICS & PARTICLE TUNER
+       ========================================================================= -->
+    <section id="lab" class="min-h-screen py-24 px-4 relative flex items-center">
+      <div class="max-w-7xl mx-auto w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <div class="lg:col-span-6 space-y-6">
+            <div class="inline-flex items-center space-x-2 font-mono text-xs text-electricEmerald tracking-widest uppercase">
+              <span class="w-8 h-[1px] bg-electricEmerald"></span>
+              <span>Interactive Hardware Sandbox</span>
+            </div>
+            <h2 class="font-cyber font-extrabold text-4xl sm:text-5xl text-white">
+              QUANTUM RESONANCE TUNER
+            </h2>
+            <p class="font-tech text-slate-300 text-lg">
+              Directly manipulate the Three.js 3D Quantum Core in real time. Modify the rotational velocity, particle dispersion, distortion harmonics, and color spectrum.
+            </p>
+
+            <!-- Working Slider Matrix -->
+            <div class="cyber-card p-6 rounded-2xl space-y-5 border border-hudBorder">
+              
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span class="text-slate-300">CORE ANGULAR VELOCITY</span>
+                  <span id="val-speed" class="text-cyberCyan font-bold">1.0x</span>
+                </div>
+                <input id="slider-speed" type="range" min="0.1" max="4.0" step="0.1" value="1.0" class="w-full accent-cyberCyan cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span class="text-slate-300">PARTICLE NODE POPULATION</span>
+                  <span id="val-particles" class="text-hyperViolet font-bold">2,400 Nodes</span>
+                </div>
+                <input id="slider-particles" type="range" min="600" max="4500" step="100" value="2400" class="w-full accent-hyperViolet cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span class="text-slate-300">GEOMETRIC TENSION PULSE</span>
+                  <span id="val-distortion" class="text-electricEmerald font-bold">0.50</span>
+                </div>
+                <input id="slider-distortion" type="range" min="0.1" max="2.0" step="0.05" value="0.5" class="w-full accent-electricEmerald cursor-pointer">
+              </div>
+
+              <div class="flex items-center justify-between pt-2">
+                <button onclick="triggerShockwavePulse(); sfxNavClick();" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyberCyan to-hyperViolet text-void font-cyber font-bold text-xs uppercase tracking-wider hover:brightness-110 shadow-neon-cyan transition-all">
+                  Trigger Resonance Shockwave
+                </button>
+                <button onclick="resetLabSettings()" class="text-xs font-mono text-slate-400 hover:text-white underline">
+                  Reset Defaults
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Lab Frequency Monitor Display -->
+          <div class="lg:col-span-6">
+            <div class="cyber-card p-6 sm:p-8 rounded-2xl space-y-6 border border-hudBorder bg-void/90">
+              <div class="flex items-center justify-between border-b border-hudBorder pb-4">
+                <span class="font-cyber font-bold text-sm tracking-wider text-white">LIVE FLUX FREQUENCY SPECTRUM</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyberCyan/20 text-cyberCyan border border-cyberCyan/40 font-bold animate-pulse">CALIBRATED</span>
+              </div>
+              
+              <!-- Frequency bars visualizer simulation -->
+              <div id="freq-bars" class="h-32 flex items-end justify-between gap-1 px-2 py-3 bg-slate-950/80 rounded-xl border border-white/5">
+                <!-- Dynamically populated via JS -->
+              </div>
+
+              <div class="grid grid-cols-2 gap-4 font-mono text-xs text-slate-400">
+                <div class="p-3 bg-white/5 rounded-lg border border-white/5">
+                  <span class="block text-[10px] text-slate-500 uppercase">Kinetic Energy</span>
+                  <span id="hud-momentum" class="text-white font-bold text-base">3.41 rad/s</span>
+                </div>
+                <div class="p-3 bg-white/5 rounded-lg border border-white/5">
+                  <span class="block text-[10px] text-slate-500 uppercase">Entropy Metric</span>
+                  <span id="hud-entropy" class="text-electricEmerald font-bold text-base">0.0142 ΔS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+       SECTION 6: INTERACTIVE HOLOGRAPHIC VIP PASS (WITH EXPORT & CONFETTI)
+       ========================================================================= -->
+    <section id="pass" class="min-h-screen py-24 px-4 relative flex items-center">
+      <div class="max-w-5xl mx-auto w-full space-y-10">
+        
+        <div class="text-center space-y-4 max-w-2xl mx-auto">
+          <div class="inline-flex items-center space-x-2 font-mono text-xs text-hologramPink tracking-widest uppercase">
+            <span class="w-8 h-[1px] bg-hologramPink"></span>
+            <span>Digital Access Credential</span>
+            <span class="w-8 h-[1px] bg-hologramPink"></span>
+          </div>
+          <h2 class="font-cyber font-extrabold text-4xl sm:text-5xl text-white">
+            MINT YOUR VIP HOLOPASS
+          </h2>
+          <p class="font-tech text-slate-300 text-base">
+            Customize your identity badge. Features real-time iridescent holographic sheen, personal operative metadata, and PNG badge download with celebration fanfare.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- Pass Configuration Inputs -->
+          <div class="lg:col-span-5 cyber-card p-6 sm:p-8 rounded-2xl space-y-4 border border-hudBorder">
+            <h3 class="font-cyber font-bold text-base text-white tracking-wide border-b border-hudBorder pb-3">
+              OPERATIVE CREDENTIAL BUILDER
+            </h3>
+            
+            <div>
+              <label class="block font-mono text-xs text-slate-400 mb-1">OPERATIVE FULL NAME</label>
+              <input id="input-name" type="text" value="ALEX CHEN" maxlength="22" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-hudBorder text-white font-cyber text-sm focus:border-cyberCyan focus:outline-none transition-colors">
+            </div>
+
+            <div>
+              <label class="block font-mono text-xs text-slate-400 mb-1">CYBERNETIC ALIAS / CALLSIGN</label>
+              <input id="input-handle" type="text" value="@0xQuantum" maxlength="18" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-hudBorder text-cyberCyan font-mono text-sm focus:border-cyberCyan focus:outline-none transition-colors">
+            </div>
+
+            <div>
+              <label class="block font-mono text-xs text-slate-400 mb-1">DESIGNATED TRACK</label>
+              <select id="input-tier" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-hudBorder text-slate-200 font-tech text-sm focus:border-cyberCyan focus:outline-none">
+                <option value="VIP ALL-ACCESS // ALPHA">VIP All-Access // Alpha Tier</option>
+                <option value="ALGORIFT HACKER // DECK">AlgoRift Hacker // Builder Pass</option>
+                <option value="QUANTUM RESEARCHER // LEVEL 4">Quantum Researcher // Level 4</option>
+                <option value="ROBOCLASH PILOT // COMBAT">RoboClash Pilot // Combat Deck</option>
+              </select>
+            </div>
+
+            <!-- Avatar Symbol Selector -->
+            <div>
+              <label class="block font-mono text-xs text-slate-400 mb-1">OPERATIVE SYMBOL</label>
+              <div class="grid grid-cols-4 gap-2">
+                <button onclick="selectBadgeAvatar('N')" class="avatar-btn active p-2 rounded-lg border border-cyberCyan bg-cyberCyan/20 font-cyber font-bold text-cyberCyan">N</button>
+                <button onclick="selectBadgeAvatar('⚡')" class="avatar-btn p-2 rounded-lg border border-hudBorder text-slate-300 hover:border-cyberCyan">⚡</button>
+                <button onclick="selectBadgeAvatar('🤖')" class="avatar-btn p-2 rounded-lg border border-hudBorder text-slate-300 hover:border-cyberCyan">🤖</button>
+                <button onclick="selectBadgeAvatar('🛡️')" class="avatar-btn p-2 rounded-lg border border-hudBorder text-slate-300 hover:border-cyberCyan">🛡️</button>
+              </div>
+            </div>
+
+            <div class="pt-4 flex flex-col space-y-3">
+              <button id="btn-mint-pass" onclick="mintAndDownloadPass()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyberCyan via-hyperViolet to-electricEmerald text-void font-cyber font-bold text-xs uppercase tracking-widest shadow-neon-cyan hover:brightness-110 transition-all flex items-center justify-center space-x-2">
+                <span>⚡ Mint & Download HoloBadge</span>
+              </button>
+              <span id="mint-status" class="font-mono text-[11px] text-center text-slate-400 min-h-[16px]">Ready to generate cryptographic pass</span>
+            </div>
+          </div>
+
+          <!-- Interactive Holographic Badge Visualizer -->
+          <div class="lg:col-span-7 flex justify-center">
+            <div id="holo-card" class="hologram-card w-full max-w-md rounded-3xl p-7 border-2 border-cyberCyan/60 shadow-2xl relative transition-transform duration-150">
+              
+              <!-- Iridescent Sheen Layer -->
+              <div id="holo-sheen" class="holo-sheen"></div>
+
+              <!-- Card Header -->
+              <div class="flex items-center justify-between pb-6 border-b border-cyberCyan/30 relative z-10">
+                <div class="flex items-center space-x-3">
+                  <div id="badge-avatar" class="w-10 h-10 rounded-xl bg-cyberCyan/20 border border-cyberCyan flex items-center justify-center font-cyber font-extrabold text-cyberCyan text-lg">
+                    N
+                  </div>
+                  <div>
+                    <span class="font-cyber font-extrabold text-sm text-white tracking-widest block">NEXUS 2026</span>
+                    <span class="font-mono text-[9px] text-cyberCyan block">VIP CREDENTIAL #<span id="badge-serial">8942-X</span></span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="font-mono text-[10px] text-electricEmerald px-2.5 py-1 bg-electricEmerald/10 border border-electricEmerald/40 rounded-full font-bold uppercase">SECURE PASS</span>
+                </div>
+              </div>
+
+              <!-- Card Body -->
+              <div class="py-6 space-y-5 relative z-10">
+                <div>
+                  <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest block">OPERATIVE CREDENTIAL</span>
+                  <div id="badge-name" class="font-cyber font-extrabold text-2xl text-white tracking-wide mt-0.5">ALEX CHEN</div>
+                  <div id="badge-handle" class="font-mono text-xs text-cyberCyan">@0xQuantum</div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 pt-1">
+                  <div>
+                    <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest block">CLEARANCE TIER</span>
+                    <span id="badge-tier" class="font-tech font-bold text-sm text-hyperViolet block mt-0.5">VIP ALL-ACCESS // ALPHA</span>
+                  </div>
+                  <div>
+                    <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest block">VENUE SECTOR</span>
+                    <span class="font-tech font-bold text-sm text-white block mt-0.5">CYBER-DOME 01</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Footer with Simulated Barcode and Chip -->
+              <div class="pt-5 border-t border-cyberCyan/30 flex items-center justify-between relative z-10">
+                <div class="space-y-1.5">
+                  <div class="h-6 flex items-center space-x-1 opacity-80">
+                    <span class="w-1 h-full bg-white"></span>
+                    <span class="w-2.5 h-full bg-white"></span>
+                    <span class="w-0.5 h-full bg-white"></span>
+                    <span class="w-1.5 h-full bg-white"></span>
+                    <span class="w-3 h-full bg-white"></span>
+                    <span class="w-0.5 h-full bg-white"></span>
+                    <span class="w-2 h-full bg-white"></span>
+                    <span class="w-1 h-full bg-white"></span>
+                    <span class="w-2.5 h-full bg-white"></span>
+                    <span class="w-1 h-full bg-white"></span>
+                  </div>
+                  <span class="font-mono text-[8px] text-slate-400 tracking-widest block">SIGNATURE: 0x88F7B2..91CE</span>
+                </div>
+                
+                <!-- Stylized Cyber Chip -->
+                <div class="w-12 h-10 bg-amber-400/20 border border-amber-400/60 rounded-lg p-1 flex flex-col justify-between">
+                  <div class="w-full h-1 bg-amber-400/50 rounded"></div>
+                  <div class="flex justify-between">
+                    <div class="w-2 h-2 bg-amber-400/70 rounded-full"></div>
+                    <div class="w-2 h-2 bg-amber-400/70 rounded-full"></div>
+                  </div>
+                  <div class="w-full h-1 bg-amber-400/50 rounded"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-hudBorder bg-void/95 backdrop-blur-xl py-12 px-4 relative z-10">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 font-mono text-xs text-slate-400">
+        
+        <div class="flex items-center space-x-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyberCyan animate-ping"></span>
+          <span class="font-cyber font-bold tracking-wider text-white">NEXUS 2026 // INTERNATIONAL CYBERNETICS CONVERGENCE</span>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-6 text-slate-300">
+          <a href="#hero" onclick="sfxNavClick()" onmouseenter="sfxHover()" class="hover:text-cyberCyan transition-colors">TOP</a>
+          <a href="#about" onclick="sfxNavClick()" onmouseenter="sfxHover()" class="hover:text-cyberCyan transition-colors">ODYSSEY</a>
+          <a href="#competitions" onclick="sfxNavClick()" onmouseenter="sfxHover()" class="hover:text-cyberCyan transition-colors">ARENAS</a>
+          <a href="#schedule" onclick="sfxNavClick()" onmouseenter="sfxHover()" class="hover:text-cyberCyan transition-colors">SCHEDULE</a>
+          <a href="#lab" onclick="sfxNavClick()" onmouseenter="sfxHover()" class="hover:text-cyberCyan transition-colors">LAB TUNER</a>
+          <a href="#pass" onclick="sfxNavClick()" onmouseenter="sfxHover()" class="hover:text-cyberCyan transition-colors">VIP BADGE</a>
+        </div>
+
+        <div class="text-slate-500 text-[11px] font-mono">
+          POWERED BY THREE.JS WEBGL & HIGH-DEF SYNTH AUDIO
+        </div>
+
+      </div>
+
+      <!-- Reserved Rights & Designer Credit Banner -->
+      <div class="max-w-7xl mx-auto mt-8 pt-6 border-t border-hudBorder/50 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-slate-400">
+        <div class="flex items-center space-x-2">
+          <span class="text-cyberCyan font-bold">© 2026 NEXUS TECHFEST.</span>
+          <span>ALL RIGHTS RESERVED.</span>
+        </div>
+        
+        <div class="cyber-card px-4 py-2 rounded-xl border border-cyberCyan/40 bg-cyberCyan/5 text-slate-200 flex items-center space-x-2 shadow-neon-cyan">
+          <span class="text-slate-400">Created and Designed by</span>
+          <span class="font-cyber font-extrabold text-cyberCyan tracking-wider uppercase text-sm drop-shadow-[0_0_8px_rgba(0,242,254,0.6)]">Preksha Vijayvargiya</span>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- =========================================================================
+       WORKING INTERACTIVE REGISTRATION MODAL
+       ========================================================================= -->
+  <div id="reg-modal" class="fixed inset-0 z-[99999] bg-void/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="cyber-card max-w-lg w-full p-6 sm:p-8 rounded-2xl border-2 border-cyberCyan/60 relative shadow-2xl space-y-5">
+      <button onclick="closeRegistrationModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-mono text-xl p-1">✕</button>
+      
+      <div>
+        <span class="font-mono text-xs text-cyberCyan uppercase tracking-widest block">OPERATIVE REGISTRATION PROTOCOL</span>
+        <h3 id="modal-track-title" class="font-cyber font-extrabold text-2xl text-white mt-1">ARENA TITLE</h3>
+      </div>
+
+      <p id="modal-track-desc" class="font-tech text-slate-300 text-sm leading-relaxed">
+        Description of the competition arena goes here.
+      </p>
+
+      <div class="p-3 bg-cyberCyan/10 border border-cyberCyan/30 rounded-xl font-mono text-xs text-cyberCyan flex justify-between">
+        <span>ARENA BOUNTY:</span>
+        <span id="modal-track-prize" class="font-bold text-white">$50,000</span>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistrationSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block font-mono text-xs text-slate-400 mb-1">TEAM LEAD FULL NAME</label>
+          <input id="reg-input-name" required type="text" placeholder="e.g. Maya Thorne" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-hudBorder text-white font-mono text-sm focus:border-cyberCyan focus:outline-none">
+        </div>
+        <div>
+          <label class="block font-mono text-xs text-slate-400 mb-1">COMMUNICATION UPLINK (EMAIL)</label>
+          <input id="reg-input-email" required type="email" placeholder="operative@nexus2026.org" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-hudBorder text-white font-mono text-sm focus:border-cyberCyan focus:outline-none">
+        </div>
+        <div>
+          <label class="block font-mono text-xs text-slate-400 mb-1">TEAM SIZE (1 - 4 OPERATIVES)</label>
+          <select class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-hudBorder text-slate-200 font-mono text-sm focus:border-cyberCyan focus:outline-none">
+            <option>Solo Operative (1)</option>
+            <option selected>Duo Squad (2)</option>
+            <option>Trio Node (3)</option>
+            <option>Full Squad (4)</option>
+          </select>
+        </div>
+
+        <div class="pt-2 flex justify-end space-x-3">
+          <button type="button" onclick="closeRegistrationModal()" class="px-5 py-2.5 rounded-xl border border-hudBorder text-xs font-mono text-slate-400 hover:text-white">
+            Cancel
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyberCyan to-hyperViolet text-void font-cyber font-bold text-xs uppercase tracking-widest shadow-neon-cyan hover:brightness-110">
+            Confirm Registration
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       JAVASCRIPT: 3D THREE.JS ENGINE, SYNTH AUDIO, AND INTERACTIVITY
+       ========================================================================= -->
+  <script>
+    /* ---------------------------------------------------------
+       1. PROCEDURAL WEB AUDIO ENGINE (ZERO LATENCY SYNTHESIS)
+       --------------------------------------------------------- */
+    let audioCtx = null;
+    let isAudioMuted = false;
+    let ambientDroneOsc = null;
+    let ambientDroneGain = null;
+    let lfoOsc = null;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Auto-unlock Web Audio on ANY user gesture (click, scroll, mousemove, touch, keydown)
+    function unlockAudioOnUserGesture() {
+      initAudioContext();
+    }
+    ['click', 'pointerdown', 'keydown', 'scroll', 'mousemove', 'touchstart'].forEach(evt => {
+      window.addEventListener(evt, unlockAudioOnUserGesture, { passive: true });
+    });
+
+    function toggleSynthAudio() {
+      initAudioContext();
+      isAudioMuted = !isAudioMuted;
+
+      const label = document.getElementById('audio-status-label');
+      const waveBars = document.querySelectorAll('#audio-wave-anim span');
+      const telemetryStat = document.getElementById('telemetry-audio-stat');
+
+      if (!isAudioMuted) {
+        if (label) {
+          label.innerText = 'SFX: LOUD (ACTIVE)';
+          label.classList.add('text-cyberCyan', 'font-bold');
+        }
+        waveBars.forEach(b => {
+          b.classList.remove('bg-slate-500');
+          b.classList.add('bg-cyberCyan', 'animate-pulse');
+        });
+        if (telemetryStat) {
+          telemetryStat.innerText = 'ONLINE (LOUD HIGH-DEF)';
+          telemetryStat.classList.add('text-electricEmerald');
+        }
+
+        try {
+          ambientDroneOsc = audioCtx.createOscillator();
+          const filter = audioCtx.createBiquadFilter();
+          ambientDroneGain = audioCtx.createGain();
+
+          ambientDroneOsc.type = 'sawtooth';
+          ambientDroneOsc.frequency.setValueAtTime(55, audioCtx.currentTime);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(220, audioCtx.currentTime);
+
+          lfoOsc = audioCtx.createOscillator();
+          const lfoGain = audioCtx.createGain();
+          lfoOsc.frequency.setValueAtTime(0.35, audioCtx.currentTime);
+          lfoGain.gain.setValueAtTime(100, audioCtx.currentTime);
+          lfoOsc.connect(filter.frequency);
+          lfoOsc.start();
+
+          ambientDroneGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+          ambientDroneGain.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 1.5);
+
+          ambientDroneOsc.connect(filter);
+          filter.connect(ambientDroneGain);
+          ambientDroneGain.connect(audioCtx.destination);
+          ambientDroneOsc.start();
+
+          sfxWarpIntro();
+          showToast('Loud SFX Synthesizer Activated', 'emerald');
+        } catch(e) {}
+      } else {
+        if (label) {
+          label.innerText = 'SFX: MUTED';
+          label.classList.remove('text-cyberCyan', 'font-bold');
+        }
+        waveBars.forEach(b => {
+          b.classList.add('bg-slate-500');
+          b.classList.remove('bg-cyberCyan', 'animate-pulse');
+        });
+        if (telemetryStat) {
+          telemetryStat.innerText = 'OFFLINE (MUTED)';
+          telemetryStat.classList.remove('text-electricEmerald');
+        }
+
+        if (ambientDroneGain && audioCtx) {
+          ambientDroneGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+          setTimeout(() => {
+            try { ambientDroneOsc.stop(); lfoOsc.stop(); } catch(e){}
+          }, 350);
+        }
+      }
+    }
+
+    function sfxNavClick() {
+      initAudioContext();
+      if (isAudioMuted || !audioCtx) return;
+      playSfxTone(1400, 'sine', 0.06, 0.35, 2600);
+      setTimeout(() => playSfxTone(2800, 'triangle', 0.04, 0.20), 15);
+    }
+
+    function sfxHover() {
+      initAudioContext();
+      if (isAudioMuted || !audioCtx) return;
+      playSfxTone(950, 'sine', 0.03, 0.12, 1300);
+    }
+
+    function sfxWarpIntro() {
+      initAudioContext();
+      if (isAudioMuted || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(3200, audioCtx.currentTime + 0.8);
+        osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 1.4);
+
+        gain.gain.setValueAtTime(0.50, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.45);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 1.5);
+      } catch(e){}
+    }
+
+    function sfxShockwave() {
+      initAudioContext();
+      if (isAudioMuted || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const subOsc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const subGain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(240, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.65);
+
+        gain.gain.setValueAtTime(0.65, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.65);
+
+        subOsc.type = 'sine';
+        subOsc.frequency.setValueAtTime(120, audioCtx.currentTime);
+        subOsc.frequency.exponentialRampToValueAtTime(24, audioCtx.currentTime + 0.7);
+
+        subGain.gain.setValueAtTime(0.80, audioCtx.currentTime);
+        subGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.7);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        subOsc.connect(subGain);
+        subGain.connect(audioCtx.destination);
+
+        osc.start();
+        subOsc.start();
+        osc.stop(audioCtx.currentTime + 0.7);
+        subOsc.stop(audioCtx.currentTime + 0.75);
+      } catch(e){}
+    }
+
+    function sfxCelebration() {
+      initAudioContext();
+      if (isAudioMuted || !audioCtx) return;
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      notes.forEach((freq, idx) => {
+        setTimeout(() => {
+          playSfxTone(freq, 'triangle', 0.28, 0.40, freq * 1.1);
+        }, idx * 90);
+      });
+    }
+
+    function playSfxTone(freq, type, duration, volume, rampFreq = null) {
+      initAudioContext();
+      if (isAudioMuted || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        if (rampFreq) {
+          osc.frequency.exponentialRampToValueAtTime(rampFreq, audioCtx.currentTime + duration);
+        }
+
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration + 0.02);
+      } catch(e){}
+    }
+
+    /* ---------------------------------------------------------
+       2. THREE.JS 3D SCENE & INTERACTIVE QUANTUM CORE
+       --------------------------------------------------------- */
+    const canvas = document.getElementById('webgl-canvas');
+    let scene, camera, renderer;
+    let coreGroup, innerCore, outerRing1, outerRing2, outerRing3, particleSystem;
+    let shockwaveMesh;
+    let satellites = [];
+    let particleCount = 2400;
+    let coreSpeed = 1.0;
+    let coreDistortion = 0.5;
+    
+    let targetCamPos = { x: 0, y: 0, z: 18 };
+    let currentCamPos = { x: 0, y: 0, z: 18 };
+    let targetCamLook = { x: 0, y: 0, z: 0 };
+    let currentCamLook = { x: 0, y: 0, z: 0 };
+
+    let mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+    let isDragging = false;
+    let prevMouse = { x: 0, y: 0 };
+
+    const THEMES = {
+      cyan: { core: 0x00f2fe, glow: 0x4facfe, ring1: 0x00f2fe, ring2: 0x9b51e0, ring3: 0x00ff88 },
+      emerald: { core: 0x00ff88, glow: 0x00aa55, ring1: 0x00ff88, ring2: 0x00f2fe, ring3: 0x76ff03 },
+      violet: { core: 0xff007f, glow: 0x9b51e0, ring1: 0xff007f, ring2: 0x9b51e0, ring3: 0x00f2fe },
+      amber: { core: 0xffaa00, glow: 0xff5500, ring1: 0xffaa00, ring2: 0xff4400, ring3: 0xffdd00 }
+    };
+    let currentThemeName = 'cyan';
+
+    function initThreeScene() {
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x030712, 0.032);
+
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 18);
+
+      renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      coreGroup = new THREE.Group();
+      scene.add(coreGroup);
+
+      // Inner Wireframe Polyhedron
+      const innerGeom = new THREE.IcosahedronGeometry(2.5, 2);
+      const innerMat = new THREE.MeshStandardMaterial({
+        color: THEMES.cyan.core,
+        emissive: 0x002244,
+        wireframe: true,
+        roughness: 0.1,
+        metalness: 0.9,
+        transparent: true,
+        opacity: 0.85
+      });
+      innerCore = new THREE.Mesh(innerGeom, innerMat);
+      coreGroup.add(innerCore);
+
+      // Inner High-Energy Core
+      const glowGeom = new THREE.IcosahedronGeometry(1.4, 1);
+      const glowMat = new THREE.MeshBasicMaterial({
+        color: THEMES.cyan.glow,
+        wireframe: false,
+        transparent: true,
+        opacity: 0.65
+      });
+      const glowCore = new THREE.Mesh(glowGeom, glowMat);
+      coreGroup.add(glowCore);
+
+      // Gyroscopic Outer Rings
+      const ring1Geom = new THREE.TorusGeometry(4.3, 0.045, 16, 100);
+      const ring1Mat = new THREE.MeshBasicMaterial({ color: THEMES.cyan.ring1, wireframe: true });
+      outerRing1 = new THREE.Mesh(ring1Geom, ring1Mat);
+      coreGroup.add(outerRing1);
+
+      const ring2Geom = new THREE.TorusGeometry(5.4, 0.035, 16, 100);
+      const ring2Mat = new THREE.MeshBasicMaterial({ color: THEMES.cyan.ring2, wireframe: true });
+      outerRing2 = new THREE.Mesh(ring2Geom, ring2Mat);
+      outerRing2.rotation.x = Math.PI / 3;
+      coreGroup.add(outerRing2);
+
+      const ring3Geom = new THREE.TorusGeometry(6.4, 0.04, 12, 80);
+      const ring3Mat = new THREE.MeshBasicMaterial({ color: THEMES.cyan.ring3, wireframe: true });
+      outerRing3 = new THREE.Mesh(ring3Geom, ring3Mat);
+      outerRing3.rotation.y = Math.PI / 4;
+      coreGroup.add(outerRing3);
+
+      // Add Orbiting Satellites
+      const satGeom = new THREE.OctahedronGeometry(0.35);
+      const satMat = new THREE.MeshBasicMaterial({ color: 0x00f2fe, wireframe: true });
+      for (let i = 0; i < 4; i++) {
+        const sat = new THREE.Mesh(satGeom, satMat);
+        const angle = (i / 4) * Math.PI * 2;
+        sat.userData = { angle: angle, radius: 7.8, speed: 0.02 + i * 0.005 };
+        coreGroup.add(sat);
+        satellites.push(sat);
+      }
+
+      // Shockwave Ring
+      const shockGeom = new THREE.RingGeometry(0.1, 0.5, 64);
+      const shockMat = new THREE.MeshBasicMaterial({
+        color: 0x00f2fe,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0
+      });
+      shockwaveMesh = new THREE.Mesh(shockGeom, shockMat);
+      shockwaveMesh.rotation.x = Math.PI / 2;
+      scene.add(shockwaveMesh);
+
+      initParticlesSystem();
+
+      // Lighting
+      const ambLight = new THREE.AmbientLight(0xffffff, 0.45);
+      scene.add(ambLight);
+
+      const point1 = new THREE.PointLight(0x00f2fe, 3.5, 45);
+      point1.position.set(12, 12, 12);
+      scene.add(point1);
+
+      const point2 = new THREE.PointLight(0x9b51e0, 3.0, 45);
+      point2.position.set(-12, -12, -12);
+      scene.add(point2);
+
+      // Interaction listeners
+      window.addEventListener('resize', handleResize);
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      window.addEventListener('mousemove', (e) => {
+        mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
+        
+        const dot = document.getElementById('cursor-dot');
+        const trail = document.getElementById('cursor-trail');
+        if (dot && trail) {
+          dot.style.left = e.clientX + 'px';
+          dot.style.top = e.clientY + 'px';
+          trail.style.left = e.clientX + 'px';
+          trail.style.top = e.clientY + 'px';
+        }
+      });
+
+      canvas.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        prevMouse = { x: e.clientX, y: e.clientY };
+      });
+      window.addEventListener('mouseup', () => isDragging = false);
+      canvas.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - prevMouse.x;
+        const deltaY = e.clientY - prevMouse.y;
+        coreGroup.rotation.y += deltaX * 0.007;
+        coreGroup.rotation.x += deltaY * 0.007;
+        prevMouse = { x: e.clientX, y: e.clientY };
+      });
+
+      canvas.addEventListener('click', () => {
+        triggerShockwavePulse();
+      });
+
+      handleScroll();
+    }
+
+    function initParticlesSystem() {
+      if (particleSystem) scene.remove(particleSystem);
+
+      const geom = new THREE.BufferGeometry();
+      const posArray = new Float32Array(particleCount * 3);
+      const colorArray = new Float32Array(particleCount * 3);
+
+      const t = THEMES[currentThemeName];
+      const color1 = new THREE.Color(t.ring1);
+      const color2 = new THREE.Color(t.ring2);
+      const color3 = new THREE.Color(t.ring3);
+
+      for (let i = 0; i < particleCount * 3; i += 3) {
+        const radius = 9 + Math.random() * 24;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos((Math.random() * 2) - 1);
+
+        posArray[i] = radius * Math.sin(phi) * Math.cos(theta);
+        posArray[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+        posArray[i + 2] = radius * Math.cos(phi);
+
+        const chosen = Math.random() < 0.4 ? color1 : (Math.random() < 0.75 ? color2 : color3);
+        colorArray[i] = chosen.r;
+        colorArray[i + 1] = chosen.g;
+        colorArray[i + 2] = chosen.b;
+      }
+
+      geom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+      geom.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+
+      const pCanvas = document.createElement('canvas');
+      pCanvas.width = 16;
+      pCanvas.height = 16;
+      const ctx = pCanvas.getContext('2d');
+      const grad = ctx.createRadialGradient(8, 8, 0, 8, 8, 8);
+      grad.addColorStop(0, 'rgba(255,255,255,1)');
+      grad.addColorStop(0.35, 'rgba(0,242,254,0.7)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 16, 16);
+
+      const pTexture = new THREE.CanvasTexture(pCanvas);
+
+      const pMat = new THREE.PointsMaterial({
+        size: 0.22,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        map: pTexture,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      particleSystem = new THREE.Points(geom, pMat);
+      scene.add(particleSystem);
+    }
+
+    function handleResize() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.fov = w < 768 ? 72 : 60;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    function handleScroll() {
+      const scrollY = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = Math.min(Math.max(scrollY / (docHeight || 1), 0), 1);
+
+      if (progress < 0.18) {
+        targetCamPos.set(0, 0, 18);
+        targetCamLook.set(0, 0, 0);
+      } else if (progress < 0.38) {
+        targetCamPos.set(8.5, 3.5, 13);
+        targetCamLook.set(-2, 0, 0);
+      } else if (progress < 0.58) {
+        targetCamPos.set(-8, -5, 14);
+        targetCamLook.set(2, 0.5, 0);
+      } else if (progress < 0.78) {
+        targetCamPos.set(0, 7, 16);
+        targetCamLook.set(0, -1, 0);
+      } else if (progress < 0.90) {
+        targetCamPos.set(3.2, 1.8, 7.5);
+        targetCamLook.set(0, 0, 0);
+      } else {
+        targetCamPos.set(-2.5, 6.5, 15);
+        targetCamLook.set(0, 0.8, 0);
+      }
+
+      updateScrollSpy();
+    }
+
+    targetCamPos.set = function(x, y, z) { this.x = x; this.y = y; this.z = z; };
+    targetCamLook.set = function(x, y, z) { this.x = x; this.y = y; this.z = z; };
+
+    function triggerShockwavePulse() {
+      if (!shockwaveMesh) return;
+      sfxShockwave();
+      shockwaveMesh.scale.set(0.1, 0.1, 0.1);
+      shockwaveMesh.material.opacity = 1.0;
+      shockwaveMesh.position.copy(coreGroup.position);
+      
+      let scale = 0.1;
+      const expand = () => {
+        scale += 0.75;
+        shockwaveMesh.scale.set(scale, scale, scale);
+        shockwaveMesh.material.opacity -= 0.038;
+        if (shockwaveMesh.material.opacity > 0) {
+          requestAnimationFrame(expand);
+        } else {
+          shockwaveMesh.scale.set(0.1, 0.1, 0.1);
+        }
+      };
+      expand();
+    }
+
+    function changeCoreTheme(themeName) {
+      if (!THEMES[themeName]) return;
+      currentThemeName = themeName;
+      const t = THEMES[themeName];
+
+      innerCore.material.color.setHex(t.core);
+      outerRing1.material.color.setHex(t.ring1);
+      outerRing2.material.color.setHex(t.ring2);
+      outerRing3.material.color.setHex(t.ring3);
+
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        if (btn.dataset.theme === themeName) {
+          btn.className = `theme-btn active px-2.5 py-1 rounded text-xs font-mono border border-cyberCyan bg-cyberCyan/20 text-cyberCyan font-bold`;
+        } else {
+          btn.className = `theme-btn px-2.5 py-1 rounded text-xs font-mono text-slate-400 hover:text-white`;
+        }
+      });
+
+      initParticlesSystem();
+      sfxNavClick();
+      showToast(`Core Theme Synced: ${themeName.toUpperCase()}`, 'cyan');
+    }
+
+    let clock = new THREE.Clock();
+    function animateThree() {
+      requestAnimationFrame(animateThree);
+      const elapsed = clock.getElapsedTime();
+
+      mouse.x += (mouse.targetX - mouse.x) * 0.05;
+      mouse.y += (mouse.targetY - mouse.y) * 0.05;
+
+      currentCamPos.x += (targetCamPos.x + mouse.x * 2.2 - currentCamPos.x) * 0.045;
+      currentCamPos.y += (targetCamPos.y + mouse.y * 2.2 - currentCamPos.y) * 0.045;
+      currentCamPos.z += (targetCamPos.z - currentCamPos.z) * 0.045;
+
+      currentCamLook.x += (targetCamLook.x - currentCamLook.x) * 0.045;
+      currentCamLook.y += (targetCamLook.y - currentCamLook.y) * 0.045;
+      currentCamLook.z += (targetCamLook.z - currentCamLook.z) * 0.045;
+
+      camera.position.set(currentCamPos.x, currentCamPos.y, currentCamPos.z);
+      camera.lookAt(currentCamLook.x, currentCamLook.y, currentCamLook.z);
+
+      if (coreGroup) {
+        if (!isDragging) {
+          coreGroup.rotation.y += 0.006 * coreSpeed;
+          coreGroup.rotation.x += 0.0025 * coreSpeed;
+        }
+
+        const scaleHarmonic = 1 + Math.sin(elapsed * 2.5 * coreSpeed) * 0.08 * coreDistortion;
+        innerCore.scale.set(scaleHarmonic, scaleHarmonic, scaleHarmonic);
+
+        outerRing1.rotation.z += 0.012 * coreSpeed;
+        outerRing2.rotation.x += 0.016 * coreSpeed;
+        outerRing3.rotation.y += 0.009 * coreSpeed;
+
+        satellites.forEach(sat => {
+          sat.userData.angle += sat.userData.speed * coreSpeed;
+          sat.position.x = Math.cos(sat.userData.angle) * sat.userData.radius;
+          sat.position.z = Math.sin(sat.userData.angle) * sat.userData.radius;
+          sat.position.y = Math.sin(elapsed * 2 + sat.userData.angle) * 1.5;
+          sat.rotation.y += 0.03;
+        });
+      }
+
+      if (particleSystem) {
+        particleSystem.rotation.y = elapsed * 0.018 * coreSpeed;
+        particleSystem.rotation.x = Math.sin(elapsed * 0.03) * 0.08;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    /* ---------------------------------------------------------
+       3. AUTOMATIC UNINTERRUPTED INTRO ANIMATION & HYPERWARP
+       --------------------------------------------------------- */
+    function runPreloader() {
+      const pBar = document.getElementById('preload-bar');
+      const pPct = document.getElementById('preload-pct');
+      const termStatus = document.getElementById('term-status');
+      const lines = [
+        document.getElementById('term-line-1'),
+        document.getElementById('term-line-2'),
+        document.getElementById('term-line-3'),
+        document.getElementById('term-line-4')
+      ];
+
+      let progress = 0;
+      const startTime = Date.now();
+      const duration = 2400; // Smooth 2.4 second entry animation sequence
+
+      const interval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        progress = Math.min(Math.floor((elapsed / duration) * 100), 100);
+
+        if (pBar) pBar.style.width = progress + '%';
+        if (pPct) pPct.innerText = progress + '%';
+
+        if (progress >= 25 && lines[1]) lines[1].classList.remove('hidden');
+        if (progress >= 60 && lines[2]) lines[2].classList.remove('hidden');
+        if (progress >= 90 && lines[3]) lines[3].classList.remove('hidden');
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          if (termStatus) {
+            termStatus.innerText = 'ACCESS_GRANTED';
+            termStatus.className = 'text-electricEmerald font-bold tracking-widest px-2.5 py-0.5 rounded bg-electricEmerald/10 border border-electricEmerald/40 animate-pulse';
+          }
+          
+          // Auto-trigger hyperspace warp transition seamlessly
+          setTimeout(() => {
+            autoEnterNexus();
+          }, 350);
+        }
+      }, 30);
+    }
+
+    function autoEnterNexus() {
+      const preloader = document.getElementById('preloader');
+      if (!preloader) return;
+
+      sfxWarpIntro();
+      triggerShockwavePulse();
+
+      // HYPERSPACE CAM WARP ANIMATION
+      targetCamPos.z = 48;
+      targetCamPos.y = 10;
+      setTimeout(() => {
+        targetCamPos.z = 18;
+        targetCamPos.y = 0;
+      }, 450);
+
+      // Smooth cinematic dissolve
+      preloader.classList.add('opacity-0', 'pointer-events-none', 'scale-125', 'blur-sm');
+      setTimeout(() => {
+        preloader.remove();
+      }, 750);
+    }
+
+    /* ---------------------------------------------------------
+       4. MOBILE MENU DRAWER & NAVIGATION SCROLLSPY
+       --------------------------------------------------------- */
+    function toggleMobileMenu() {
+      const drawer = document.getElementById('mobile-drawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    function updateScrollSpy() {
+      const sections = ['about', 'competitions', 'schedule', 'lab', 'pass'];
+      const navLinks = document.querySelectorAll('#desktop-nav .nav-link');
+      
+      let currentSection = '';
+      sections.forEach(secId => {
+        const el = document.getElementById(secId);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 250 && rect.bottom >= 250) {
+            currentSection = secId;
+          }
+        }
+      });
+
+      navLinks.forEach(link => {
+        const href = link.getAttribute('href').replace('#', '');
+        if (href === currentSection) {
+          link.classList.add('text-cyberCyan', 'border-cyberCyan', 'font-bold');
+          link.classList.remove('text-slate-300', 'border-transparent');
+        } else {
+          link.classList.remove('text-cyberCyan', 'border-cyberCyan', 'font-bold');
+          link.classList.add('text-slate-300', 'border-transparent');
+        }
+      });
+    }
+
+    /* ---------------------------------------------------------
+       5. DYNAMIC KEYWORD CYCLER
+       --------------------------------------------------------- */
+    const KEYWORDS = [
+      'QUANTUM COMPUTING',
+      'NEURAL SYNTHESIS',
+      'AUTONOMOUS ROBOTICS',
+      'ZERO-KNOWLEDGE CRYPTO',
+      'SPATIAL METAVERSES'
+    ];
+    let kwIdx = 0;
+    function cycleKeywords() {
+      const el = document.getElementById('animated-keyword');
+      if (!el) return;
+      kwIdx = (kwIdx + 1) % KEYWORDS.length;
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.innerText = KEYWORDS[kwIdx];
+        el.style.opacity = '1';
+      }, 250);
+    }
+    setInterval(cycleKeywords, 2800);
+
+    /* ---------------------------------------------------------
+       6. ARENAS SEARCH & CATEGORY FILTER
+       --------------------------------------------------------- */
+    function filterArenas(category) {
+      sfxNavClick();
+      const buttons = document.querySelectorAll('.arena-filter');
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-cyberCyan', 'text-void', 'font-bold');
+        btn.classList.add('border', 'border-hudBorder', 'text-slate-300');
+      });
+      event.target.classList.add('bg-cyberCyan', 'text-void', 'font-bold');
+      event.target.classList.remove('border', 'border-hudBorder', 'text-slate-300');
+
+      const cards = document.querySelectorAll('.arena-card');
+      cards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function searchArenas() {
+      const query = document.getElementById('search-arenas').value.toLowerCase();
+      const cards = document.querySelectorAll('.arena-card');
+      cards.forEach(card => {
+        const text = card.dataset.keywords.toLowerCase();
+        if (text.includes(query)) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    /* ---------------------------------------------------------
+       7. INTERACTIVE SCHEDULE TIMELINE DATA & SEARCH
+       --------------------------------------------------------- */
+    const SCHEDULE_DATA = {
+      1: [
+        { time: '09:00 UTC', title: 'Grand Opening Keynote: Post-Quantum Architecture', speaker: 'Dr. Elena Vance (Quantum Neural Labs)', venue: 'Sector 01 Main Stage' },
+        { time: '11:30 UTC', title: 'AlgoRift 48H Hackathon Begins // Track Briefing', speaker: 'Core Mentors & Protocol Labs', venue: 'Hackers Deck Beta' },
+        { time: '14:00 UTC', title: 'Autonomous Drone Swarm Perception Showcase', speaker: 'Apex Dynamics Engineering', venue: 'Arena 03 Outdoor Grid' },
+        { time: '18:00 UTC', title: 'Cybernetic Sound Synthesis Live Concert', speaker: 'SYNTH-9 Collective', venue: 'Holosphere Pavilion' }
+      ],
+      2: [
+        { time: '10:00 UTC', title: 'Zero-Knowledge Proofs in Planetary Rollups', speaker: 'Sophia Lin (ZK-Mesh)', venue: 'Sector 02 Auditorium' },
+        { time: '13:00 UTC', title: 'RoboClash V Championship Eliminators', speaker: '16 Teams Head-to-Head', venue: 'Combat Arena Dome' },
+        { time: '16:30 UTC', title: 'Hologram Jam: Generative WebGPU Live Coding', speaker: 'WebGL Guild International', venue: 'CyberLab 04' },
+        { time: '20:00 UTC', title: 'Midnight AI Agent Game: CTF Defense', speaker: 'Anonymous Node Matrix', venue: 'Virtual Codespace' }
+      ],
+      3: [
+        { time: '10:30 UTC', title: 'Embodied Foundation Models in Humanoid Robotics', speaker: 'Kaelen Cross (Robotics VP)', venue: 'Main Arena Stage' },
+        { time: '14:00 UTC', title: 'AlgoRift Hackathon Finals: Top 8 Demos', speaker: 'Global Judging Panel', venue: 'Sector 01 Main Stage' },
+        { time: '17:00 UTC', title: 'Grand Award Ceremony & $150,000 Bounty Grants', speaker: 'Techfest Steering Committee', venue: 'Main Arena Stage' },
+        { time: '19:00 UTC', title: 'Nexus 2026 Closing Rave & Laser Matrix', speaker: 'Quantum Holographic Artists', venue: 'Full Festival Grounds' }
+      ]
+    };
+    let currentScheduleDay = 1;
+
+    function switchScheduleDay(dayNum) {
+      currentScheduleDay = dayNum;
+      sfxNavClick();
+      document.querySelectorAll('.day-tab').forEach((tab, idx) => {
+        if (idx + 1 === dayNum) {
+          tab.className = 'day-tab active px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider bg-cyberCyan text-void font-bold shadow-neon-cyan transition-all';
+        } else {
+          tab.className = 'day-tab px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider text-slate-400 hover:text-white transition-all';
+        }
+      });
+      renderScheduleItems();
+    }
+
+    function renderScheduleItems(filterText = '') {
+      const container = document.getElementById('schedule-container');
+      let items = SCHEDULE_DATA[currentScheduleDay] || [];
+      if (filterText) {
+        items = items.filter(item => 
+          item.title.toLowerCase().includes(filterText.toLowerCase()) || 
+          item.speaker.toLowerCase().includes(filterText.toLowerCase())
+        );
+      }
+
+      if (items.length === 0) {
+        container.innerHTML = `<div class="text-center font-mono text-xs text-slate-500 py-8">No matching schedule sessions found.</div>`;
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="cyber-card p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-hudBorder hover:border-cyberCyan transition-all">
+          <div class="flex items-start space-x-4">
+            <div class="px-3 py-1.5 rounded-lg bg-cyberCyan/10 border border-cyberCyan/40 text-cyberCyan font-mono text-xs font-bold whitespace-nowrap">
+              ${item.time}
+            </div>
+            <div>
+              <h4 class="font-cyber font-bold text-base text-white">${item.title}</h4>
+              <p class="font-tech text-xs text-slate-400 mt-0.5">Presenter: <span class="text-slate-300 font-semibold">${item.speaker}</span></p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3 text-right">
+            <span class="font-mono text-xs text-slate-400">${item.venue}</span>
+            <button onclick="openRegistrationModal('${item.title}', 'Reserve priority seat access or interactive live stream stream uplink.', 'Reserved Seat Pass')" class="px-3 py-1.5 rounded-lg border border-hudBorder hover:border-cyberCyan text-xs font-mono text-cyberCyan transition-all">
+              RSVP ⟶
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterScheduleItems() {
+      const val = document.getElementById('search-schedule').value;
+      renderScheduleItems(val);
+    }
+
+    /* ---------------------------------------------------------
+       8. CYBERLAB CONTROLS & AI ASSISTANT WIDGET
+       --------------------------------------------------------- */
+    function initLabControls() {
+      const sliderSpeed = document.getElementById('slider-speed');
+      const sliderParticles = document.getElementById('slider-particles');
+      const sliderDistortion = document.getElementById('slider-distortion');
+
+      if (sliderSpeed) {
+        sliderSpeed.addEventListener('input', (e) => {
+          coreSpeed = parseFloat(e.target.value);
+          document.getElementById('val-speed').innerText = coreSpeed.toFixed(1) + 'x';
+          document.getElementById('hud-momentum').innerText = (coreSpeed * 3.41).toFixed(2) + ' rad/s';
+          document.getElementById('telemetry-tension').innerText = (coreSpeed * 1.0).toFixed(3) + ' G-Force';
+        });
+      }
+
+      if (sliderParticles) {
+        sliderParticles.addEventListener('change', (e) => {
+          particleCount = parseInt(e.target.value);
+          document.getElementById('val-particles').innerText = particleCount.toLocaleString() + ' Nodes';
+          document.getElementById('telemetry-particles').innerText = particleCount.toLocaleString() + ' Nodes';
+          initParticlesSystem();
+          sfxNavClick();
+        });
+      }
+
+      if (sliderDistortion) {
+        sliderDistortion.addEventListener('input', (e) => {
+          coreDistortion = parseFloat(e.target.value);
+          document.getElementById('val-distortion').innerText = coreDistortion.toFixed(2);
+          document.getElementById('hud-entropy').innerText = (coreDistortion * 0.0284).toFixed(4) + ' ΔS';
+        });
+      }
+
+      const freqContainer = document.getElementById('freq-bars');
+      if (freqContainer) {
+        const barCount = 32;
+        const bars = [];
+        for (let i = 0; i < barCount; i++) {
+          const bar = document.createElement('div');
+          bar.className = 'w-full bg-gradient-to-t from-cyberCyan to-hyperViolet rounded-t transition-all duration-100';
+          bar.style.height = `${20 + Math.random() * 60}%`;
+          freqContainer.appendChild(bar);
+          bars.push(bar);
+        }
+        setInterval(() => {
+          bars.forEach((bar, idx) => {
+            const harmonic = Math.sin(Date.now() * 0.006 + idx * 0.28) * 36;
+            const h = Math.min(Math.max(12 + harmonic + Math.random() * 26, 8), 100);
+            bar.style.height = `${h}%`;
+          });
+        }, 90);
+      }
+    }
+
+    function resetLabSettings() {
+      coreSpeed = 1.0;
+      particleCount = 2400;
+      coreDistortion = 0.5;
+
+      document.getElementById('slider-speed').value = 1.0;
+      document.getElementById('slider-particles').value = 2400;
+      document.getElementById('slider-distortion').value = 0.5;
+
+      document.getElementById('val-speed').innerText = '1.0x';
+      document.getElementById('val-particles').innerText = '2,400 Nodes';
+      document.getElementById('val-distortion').innerText = '0.50';
+      document.getElementById('hud-momentum').innerText = '3.41 rad/s';
+      document.getElementById('hud-entropy').innerText = '0.0142 ΔS';
+
+      initParticlesSystem();
+      sfxNavClick();
+      showToast('Quantum Resonance Reset to Nominal', 'emerald');
+    }
+
+    // AI Chat Assistant Helper
+    function toggleAiChat() {
+      sfxNavClick();
+      const box = document.getElementById('ai-chat-box');
+      box.classList.toggle('hidden');
+    }
+
+    function askAiQuestion(topic) {
+      sfxNavClick();
+      const msgContainer = document.getElementById('ai-messages');
+      let userText = '';
+      let aiResponse = '';
+
+      if (topic === 'arenas') {
+        userText = "Where can I view competition arenas?";
+        aiResponse = "We have 4 major arenas: AlgoRift Hackathon ($50k), RoboClash V ($40k), ZeroKnowledge CTF ($35k), and Hologram Jam ($25k). Click 'Enter Track' to register!";
+      } else if (topic === 'register') {
+        userText = "How do I register my team?";
+        aiResponse = "Click on any track 'Enter Track' button to open the Operative Registration Protocol modal and submit your team details!";
+      } else if (topic === 'schedule') {
+        userText = "What is on the Day 1 schedule?";
+        aiResponse = "Day 1 starts with Dr. Elena Vance's Post-Quantum Architecture Keynote at 09:00 UTC, followed by AlgoRift brief & Drone Swarm showcases!";
+      } else if (topic === 'badge') {
+        userText = "How do I mint my VIP HoloPass?";
+        aiResponse = "Scroll to the VIP HoloPass section, enter your callsign and full name, then click 'Mint & Download HoloBadge' to export a high-res PNG credential!";
+      }
+
+      msgContainer.innerHTML += `<div class="text-slate-300 text-right">👤 You: ${userText}</div>`;
+      setTimeout(() => {
+        msgContainer.innerHTML += `<div class="text-cyberCyan">🤖 NEXUS-AI: ${aiResponse}</div>`;
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+      }, 300);
+    }
+
+    /* ---------------------------------------------------------
+       9. HOLOGRAPHIC VIP BADGE INTERACTION, MINT & DOWNLOAD
+       --------------------------------------------------------- */
+    function initHoloCard() {
+      const card = document.getElementById('holo-card');
+      const sheen = document.getElementById('holo-sheen');
+      const inName = document.getElementById('input-name');
+      const inHandle = document.getElementById('input-handle');
+      const inTier = document.getElementById('input-tier');
+      const badgeName = document.getElementById('badge-name');
+      const badgeHandle = document.getElementById('badge-handle');
+      const badgeTier = document.getElementById('badge-tier');
+
+      if (inName) {
+        inName.addEventListener('input', (e) => {
+          badgeName.innerText = e.target.value.toUpperCase() || 'OPERATIVE';
+        });
+      }
+
+      if (inHandle) {
+        inHandle.addEventListener('input', (e) => {
+          badgeHandle.innerText = e.target.value || '@0xQuantum';
+        });
+      }
+
+      if (inTier) {
+        inTier.addEventListener('change', (e) => {
+          badgeTier.innerText = e.target.value;
+        });
+      }
+
+      if (card && sheen) {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+
+          const rotX = (y / (rect.height / 2)) * -14;
+          const rotY = (x / (rect.width / 2)) * 14;
+
+          card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02, 1.02, 1.02)`;
+
+          const sheenX = ((e.clientX - rect.left) / rect.width) * 100;
+          const sheenY = ((e.clientY - rect.top) / rect.height) * 100;
+          sheen.style.background = `radial-gradient(circle at ${sheenX}% ${sheenY}%, rgba(0,242,254,0.4) 0%, rgba(155,81,224,0.3) 40%, rgba(255,0,127,0.2) 70%, transparent 90%)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
+      }
+    }
+
+    function selectBadgeAvatar(symbol) {
+      sfxNavClick();
+      document.getElementById('badge-avatar').innerText = symbol;
+      document.querySelectorAll('.avatar-btn').forEach(btn => {
+        if (btn.innerText === symbol) {
+          btn.className = 'avatar-btn active p-2 rounded-lg border border-cyberCyan bg-cyberCyan/20 font-cyber font-bold text-cyberCyan';
+        } else {
+          btn.className = 'avatar-btn p-2 rounded-lg border border-hudBorder text-slate-300 hover:border-cyberCyan';
+        }
+      });
+    }
+
+    function mintAndDownloadPass() {
+      const btn = document.getElementById('btn-mint-pass');
+      const status = document.getElementById('mint-status');
+      const card = document.getElementById('holo-card');
+
+      btn.disabled = true;
+      status.innerText = 'GENERATING CRYPTOGRAPHIC PROOF...';
+      status.className = 'font-mono text-[11px] text-center text-cyberCyan font-bold animate-pulse';
+
+      sfxCelebration();
+
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 85,
+          origin: { y: 0.65 },
+          colors: ['#00f2fe', '#9b51e0', '#00ff88', '#ff007f']
+        });
+      }
+
+      setTimeout(() => {
+        if (typeof html2canvas === 'function' && card) {
+          html2canvas(card, {
+            backgroundColor: '#030712',
+            scale: 2
+          }).then(c => {
+            const link = document.createElement('a');
+            link.download = `NEXUS2026-VIP-${Date.now()}.png`;
+            link.href = c.toDataURL('image/png');
+            link.click();
+
+            status.innerText = 'PASSPORT MINTED & DOWNLOADED TO DISK!';
+            status.className = 'font-mono text-[11px] text-center text-electricEmerald font-bold';
+            btn.disabled = false;
+            showToast('VIP Credential Downloaded Successfully', 'emerald');
+          }).catch(() => {
+            status.innerText = 'PASS MINTED IN VAULT (MOCK DOWNLOAD COMPLETE)';
+            status.className = 'font-mono text-[11px] text-center text-electricEmerald font-bold';
+            btn.disabled = false;
+          });
+        }
+      }, 1200);
+    }
+
+    /* ---------------------------------------------------------
+       10. REGISTRATION MODALS & TOAST SYSTEM
+       --------------------------------------------------------- */
+    function openRegistrationModal(title, desc, prize) {
+      sfxNavClick();
+      document.getElementById('modal-track-title').innerText = title;
+      document.getElementById('modal-track-desc').innerText = desc;
+      document.getElementById('modal-track-prize').innerText = prize;
+
+      const modal = document.getElementById('reg-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeRegistrationModal() {
+      sfxNavClick();
+      const modal = document.getElementById('reg-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleRegistrationSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-input-name').value;
+      const track = document.getElementById('modal-track-title').innerText;
+      
+      closeRegistrationModal();
+      sfxCelebration();
+
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 } });
+      }
+
+      showToast(`Registration Confirmed for ${name} in ${track}!`, 'emerald');
+      document.getElementById('reg-form').reset();
+    }
+
+    function showToast(message, type = 'cyan') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      const borderColor = type === 'emerald' ? 'border-electricEmerald text-electricEmerald' : 'border-cyberCyan text-cyberCyan';
+      
+      toast.className = `cyber-card px-4 py-3 rounded-xl border ${borderColor} text-xs font-mono shadow-2xl flex items-center space-x-2 pointer-events-auto transform translate-y-2 transition-all duration-300`;
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-current animate-ping"></span>
+        <span class="text-white">${message}</span>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    /* ---------------------------------------------------------
+       11. LIVE COUNTDOWN TIMER
+       --------------------------------------------------------- */
+    function updateLiveCountdown() {
+      const targetDate = new Date('2026-10-16T09:00:00Z').getTime();
+      const now = new Date().getTime();
+      const diff = Math.max(targetDate - now, 0);
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const centisecs = Math.floor((diff % 1000) / 10);
+
+      const dEl = document.getElementById('days');
+      const hEl = document.getElementById('hours');
+      const mEl = document.getElementById('mins');
+      const msEl = document.getElementById('millis');
+
+      if (dEl) dEl.innerText = String(days).padStart(2, '0');
+      if (hEl) hEl.innerText = String(hours).padStart(2, '0');
+      if (mEl) mEl.innerText = String(mins).padStart(2, '0');
+      if (msEl) msEl.innerText = String(centisecs).padStart(2, '0');
+    }
+
+    /* ---------------------------------------------------------
+       12. INITIALIZATION ENTRY POINT
+       --------------------------------------------------------- */
+    window.onload = function () {
+      initThreeScene();
+      animateThree();
+      runPreloader();
+      switchScheduleDay(1);
+      initLabControls();
+      initHoloCard();
+
+      setInterval(updateLiveCountdown, 40);
+    };
+  </script>
+</body>
+</html>
